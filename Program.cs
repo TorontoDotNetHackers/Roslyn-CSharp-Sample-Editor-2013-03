@@ -178,19 +178,22 @@ class Greeter
                 if (d.Location.IsInSource)
                 {
                     var origFore = Console.ForegroundColor;
-                    var origBAck = Console.BackgroundColor;
+                    var origBack = Console.BackgroundColor;
 
                     Console.BackgroundColor = ConsoleColor.Red;
                     Console.ForegroundColor = ConsoleColor.Black;
                     Console.Write(tbSource.Text.Substring(d.Location.SourceSpan.Start, d.Location.SourceSpan.Length));
+
                     // Hey Roslyn !! - d.*
-                    richResult.Select(d.Location.SourceSpan.Start, d.Location.SourceSpan.Length);
+                    int lineEndOffset = d.Location.GetLineSpan(true).StartLinePosition.Line;
+                    // Note: line endings in rich text box use one character where textbox input source uses two
+                    richResult.Select(d.Location.SourceSpan.Start - lineEndOffset, d.Location.SourceSpan.Length);
                     richResult.SelectionColor = Color.Yellow;
                     richResult.SelectionBackColor = Color.Red;
                     if (d.Location.SourceSpan.Length == 0)
                         issuePoints.Add(richResult.GetPositionFromCharIndex(d.Location.SourceSpan.Start));
 
-                    Console.BackgroundColor = origBAck;
+                    Console.BackgroundColor = origBack;
                     Console.ForegroundColor = origFore;
 
                     Console.WriteLine(tbSource.Text.Substring(d.Location.SourceSpan.Start + d.Location.SourceSpan.Length));
